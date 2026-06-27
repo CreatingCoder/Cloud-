@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Cloud+ Identity & Access Management Quiz</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --primary-color: #007bff;
+            --correct-color: #d4edda;
+            --correct-text: #155724;
+            --incorrect-color: #f8d7da;
+            --incorrect-text: #721c24;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 650px;
+            width: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .progress, .score-tracker {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .option-item:hover {
+            border-color: var(--primary-color);
+            background-color: #eef5ff;
+        }
+
+        .option-item.correct {
+            background-color: var(--correct-color) !important;
+            border-color: #c3e6cb !important;
+            color: var(--correct-text) !important;
+        }
+
+        .option-item.incorrect {
+            background-color: var(--incorrect-color) !important;
+            border-color: #f5c6cb !important;
+            color: var(--incorrect-text) !important;
+        }
+
+        .option-item.disabled {
+            pointer-events: none;
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .action-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .results-screen {
+            text-align: center;
+            display: none;
+        }
+
+        .results-screen h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .final-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-ui">
+        <div class="header">
+            <span class="progress" id="progress-text">Question 1 of 40</span>
+            <span class="score-tracker" id="score-text">Score: 0/0</span>
+        </div>
+        <div class="question" id="question-text">Loading question...</div>
+        <ul class="options-list" id="options-container">
+            </ul>
+        <button class="action-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <div id="results-ui" class="results-screen">
+        <h2>Quiz Completed!</h2>
+        <p>Your ultimate CompTIA Cloud+ IAM score is:</p>
+        <div class="final-score" id="final-score-text">0/40</div>
+        <button class="action-btn" style="display:block;" onclick="restartQuiz()">Retake Quiz</button>
+    </div>
+</div>
+
+<script>
+const quizData = [
+    // --- AUTHENTICATION MODELS: Local Users ---
+    {
+        q: "An administrator needs to create a quick test environment in a public cloud instance without integrating corporate identity directories. Which authentication model relies on account assets stored directly on that isolated cloud instance instance?",
+        a: ["Federation", "Local users", "Directory-based", "Token-based"],
+        c: 1
+    },
+    {
+        q: "What is a primary administrative disadvantage of managing local users across a multi-region cloud deployment with hundreds of virtual machines?",
+        a: ["Lack of encryption capabilities", "High operational overhead to sync and manage accounts", "Increased latency due to network routing", "Incompatibility with Linux distributions"],
+        c: 1
+    },
+    {
+        q: "When an engineer logs directly into a standalone AWS EC2 Windows instance using a native user account managed inside that specific OS's SAM database, what model is being used?",
+        a: ["SAML 2.0", "Local users authentication", "OAuth 2.0", "Federated access"],
+        c: 1
+    },
+    {
+        q: "Which security risk is most closely associated with the widespread use of local users instead of centralized authentication in cloud infrastructure?",
+        a: ["Orphaned accounts remaining active after employee termination", "Cross-site scripting (XSS)", "SQL injection on the login page", "Denial of service (DoS) on the central directory"],
+        c: 0
+    },
+
+    // --- AUTHENTICATION MODELS: Federation (General & SAML) ---
+    {
+        q: "Which concept allows users to log into a single corporate portal and access multiple external cloud services (SaaS) without re-entering credentials?",
+        a: ["Local user accounts", "Identity Federation", "Discretionary access control", "Group-based containment"],
+        c: 1
+    },
+    {
+        q: "In a federated architecture, what role does the corporate Active Directory server play when it validates a user's password and issues a token to a cloud provider?",
+        a: ["Service Provider (SP)", "Identity Provider (IdP)", "Relying Party (RP)", "Authorization Server"],
+        c: 1
+    },
+    {
+        q: "Security Assertion Markup Language (SAML) is fundamentally based on which language format for exchanging data?",
+        a: ["JSON", "YAML", "XML", "INI"],
+        c: 2
+    },
+    {
+        q: "When implementing SAML-based SSO for a cloud application, what file type containing cryptographic public keys is typically exchanged to establish trust between the IdP and SP?",
+        a: ["Metadata XML file", "JSON Web Token (JWT)", "Private key .pem file", "OAuth client secret"],
+        c: 0
+    },
+    {
+        q: "A company uses Salesforce cloud and wants employees to log in using their corporate Active Directory credentials via a web browser. Which protocol is designed specifically for this XML-based web SSO enterprise use case?",
+        a: ["SAML", "RADIUS", "LDAP", "OAuth 1.0"],
+        c: 0
+    },
+    {
+        q: "In a SAML workflow, what is the term used for the piece of data sent to the cloud application that asserts the user's identity and permissions?",
+        a: ["SAML Assertion", "Access Token", "Refresh Token", "Ticket Granting Ticket"],
+        c: 0
+    },
+
+    // --- AUTHENTICATION MODELS: Token-Based ---
+    {
+        q: "Which type of authentication model relies on a stateless, signed string (such as a JWT) passed in the HTTP header to verify a user's identity for subsequent cloud API requests?",
+        a: ["Local user database", "Token-based authentication", "Directory-based synchronization", "Discretionary identity validation"],
+        c: 1
+    },
+    {
+        q: "What makes JSON Web Tokens (JWT) highly secure and suitable for distributed, stateless cloud architectures?",
+        a: ["They encrypt the payload so it cannot be read by anyone.", "They are cryptographically signed by the issuer.", "They require constant real-time lookups to a local database.", "They never expire."],
+        c: 1
+    },
+    {
+        q: "When a cloud API server accepts a token, verifies its digital signature, and grants access without querying a database, what is a key benefit being realized?",
+        a: ["High scalability and reduced server load", "Enhanced multi-factor protection", "Mandatory access control enforcement", "Complete protection against phishing"],
+        c: 0
+    },
+    {
+        q: "What token type is usually long-lived and used to obtain a new short-lived access token without forcing the cloud user to re-enter credentials?",
+        a: ["SAML Assertion", "Refresh Token", "Session Token", "ID Token"],
+        c: 1
+    },
+
+    // --- AUTHENTICATION MODELS: Directory-Based ---
+    {
+        q: "An enterprise wants a single, centralized database of users and groups that maps directly to cloud resources via protocols like LDAP or LDAPS. What model is this?",
+        a: ["Local users model", "Token-only model", "Directory-based authentication", "OAuth server model"],
+        c: 2
+    },
+    {
+        q: "Which service represents a widely used cloud-native directory-based authentication platform?",
+        a: ["Microsoft Entra ID (formerly Azure AD)", "SAML Assertion Server", "OAuth 2.0 Playground", "Local SAM Database"],
+        c: 0
+    },
+    {
+        q: "What security protocol is typically used to query and authenticate against an on-premises or cloud-hosted directory service securely over port 636?",
+        a: ["HTTP", "LDAPS", "SAML", "OAuth"],
+        c: 2
+    },
+    {
+        q: "When syncing on-premises Active Directory to a cloud directory service, what is typically synchronized to allow seamless authentication in the cloud?",
+        a: ["The entire NTDS.dit database file", "Cleartext passwords", "Password hashes or hash differentials", "Kerberos tickets"],
+        c: 2
+    },
+
+    // --- AUTHENTICATION MODELS: Multi-factor Authentication (MFA) ---
+    {
+        q: "Which of the following represents a multi-factor authentication setup combining 'Something you know' and 'Something you have'?",
+        a: ["A password and a PIN", "A fingerprint and a retina scan", "A password and a hardware TOTP key fob", "A smartcard and a certificate"],
+        c: 2
+    },
+    {
+        q: "What type of MFA mechanism generates a new 6-digit code every 30 seconds based on a shared secret key and the current time?",
+        a: ["HOTP (HMAC-based)", "TOTP (Time-based)", "SMS text messaging", "Static PIN fallback"],
+        c: 1
+    },
+    {
+        q: "A cloud administrator wants to prevent brute-force and credential stuffing attacks on administrative cloud accounts. What is the most effective single control to implement?",
+        a: ["Complex passwords", "Multi-factor Authentication (MFA)", "Increasing local log retention", "Changing the username nomenclature"],
+        c: 1
+    },
+    {
+        q: "Which MFA method is considered the MOST vulnerable to interception or SIM-swapping attacks?",
+        a: ["Hardware Security Key (FIDO2)", "Authenticator App Push Notification", "SMS/Text message delivery", "Biometric facial recognition"],
+        c: 2
+    },
+
+    // --- AUTHENTICATION MODELS: OpenID Connect (OIDC) ---
+    {
+        q: "OpenID Connect (OIDC) is an identity layer built directly on top of which framework?",
+        a: ["SAML 2.0", "OAuth 2.0", "LDAP", "Kerberos"],
+        c: 1
+    },
+    {
+        q: "While OAuth 2.0 handles authorization, OpenID Connect (OIDC) specifically addresses which function in cloud applications?",
+        a: ["Data encryption at rest", "Authentication (Identity verification)", "Federated accounting", "Network perimeter security"],
+        c: 1
+    },
+    {
+        q: "Which type of token does OpenID Connect introduce to pass user profile attributes (like name and email) to the application?",
+        a: ["Access Token", "Refresh Token", "ID Token", "SAML Assertion"],
+        c: 2
+    },
+    {
+        q: "Which data format does OpenID Connect use to transmit its tokens?",
+        a: ["XML", "JSON (via JWT)", "YAML", "ASN.1"],
+        c: 1
+    },
+
+    // --- AUTHORIZATION MODELS: Role-Based Access Control (RBAC) ---
+    {
+        q: "In a cloud environment, granting permissions to an abstract entity called 'Cloud Administrator' or 'Billing Auditor' instead of assigning permissions directly to specific users is an example of what?",
+        a: ["Discretionary Access Control (DAC)", "Role-Based Access Control (RBAC)", "Mandatory Access Control (MAC)", "Rule-Based Access Control"],
+        c: 1
+    },
+    {
+        q: "What is a primary benefit of using RBAC in a cloud environment with high employee turnover?",
+        a: ["Users can hand off permissions to peers freely.", "Permissions are bound to a job function, simplified via group/role assignment.", "It automatically generates MFA requirements.", "It switches permissions dynamically based on time of day."],
+        c: 1
+    },
+    {
+        q: "If an engineer joins the security team and is assigned the 'Security Analyst' role in AWS or Azure, what happens to their access?",
+        a: ["They gain all permissions globally.", "They inherit all permissions explicitly mapped to that role template.", "They must manually request access to every single file.", "The previous analyst's account is overwritten."],
+        c: 1
+    },
+    {
+        q: "Which security principle is most easily maintained and audited by leveraging properly scoped RBAC roles in a cloud environment?",
+        a: ["Defense in depth", "Least privilege", "Data sovereignty", "High availability"],
+        c: 1
+    },
+
+    // --- AUTHORIZATION MODELS: Group-Based Access Control ---
+    {
+        q: "An administrator assigns a set of cloud storage read-only privileges to a folder. Instead of managing individual roles or people, they add user objects to a container called 'HR-Dept'. What authorization concept is this?",
+        a: ["Discretionary Access Control", "Group-based access control", "Token exchange", "Federated provisioning"],
+        c: 1
+    },
+    {
+        q: "What is the structural relationship between groups and roles in standard enterprise cloud identity architecture?",
+        a: ["Groups cannot contain roles.", "Users are placed into groups; groups can then be mapped to roles or assigned permissions collectively.", "Roles contain groups exclusively.", "They are entirely interchangeable with no functional difference."],
+        c: 1
+    },
+    {
+        q: "When a cloud user is removed from an Active Directory group called 'DevOps-Team', what immediate effect does it have on their authorization?",
+        a: ["They lose the permissions granted specifically through that group membership.", "Their entire cloud account is deleted.", "They are moved to a local user model.", "Their multi-factor authentication is disabled."],
+        c: 0
+    },
+
+    // --- AUTHORIZATION MODELS: OAuth 2.0 ---
+    {
+        q: "A third-party cloud application requests permission to view your Google Calendar without ever seeing or storing your Google password. Which framework enables this?",
+        a: ["SAML 2.0", "OAuth 2.0", "RBAC", "LDAPS"],
+        c: 1
+    },
+    {
+        q: "In the OAuth 2.0 framework, what is the term used for the string issued by the authorization server that grants the client app access to protected resources?",
+        a: ["Access Token", "SAML Assertion", "Password Hash", "User Principal Name"],
+        c: 0
+    },
+    {
+        q: "In OAuth 2.0 parlance, what is the 'Resource Server'?",
+        a: ["The application requesting access to data", "The server holding user accounts and validating credentials", "The API hosting the data or resource the app wants to access", "The end-user who owns the data"],
+        c: 2
+    },
+    {
+        q: "What is an OAuth 2.0 'Scope' used for?",
+        a: ["Specifying the lifetime of an active user session", "Limiting the specific permissions/degrees of access requested by an application", "Mapping out the corporate directory structure", "Validating the XML schema of an assertion"],
+        c: 1
+    },
+
+    // --- AUTHORIZATION MODELS: Discretionary Access Control (DAC) ---
+    {
+        q: "Which authorization model specifies that the data owner or creator has complete control over granting access permissions to others?",
+        a: ["Mandatory Access Control (MAC)", "Role-Based Access Control (RBAC)", "Discretionary Access Control (DAC)", "Rule-Based Access Control"],
+        c: 2
+    },
+    {
+        q: "Where is Discretionary Access Control (DAC) most commonly observed within cloud operating systems?",
+        a: ["Standard file and folder permissions (e.g., NTFS or Linux chmod)", "Corporate SSO federation policies", "Organization-wide cloud root guardrails", "OAuth authorization flows"],
+        c: 0
+    },
+    {
+        q: "What is a notable security risk associated with Discretionary Access Control (DAC) in cloud data repositories?",
+        a: ["It is too rigid and cannot be changed by administrators.", "Data owners can accidentally grant over-permissive access to sensitive files to public users.", "It relies strictly on centralized XML servers.", "It doesn't support alphanumeric characters."],
+        c: 1
+    }
+];
+
+let currentQuestionIndex = 0;
+let score = 0;
+let totalAnswered = 0;
+
+const questionTextElem = document.getElementById('question-text');
+const optionsContainerElem = document.getElementById('options-container');
+const progressTextElem = document.getElementById('progress-text');
+const scoreTextElem = document.getElementById('score-text');
+const nextBtnElem = document.getElementById('next-btn');
+const quizUiElem = document.getElementById('quiz-ui');
+const resultsUiElem = document.getElementById('results-ui');
+const finalScoreTextElem = document.getElementById('final-score-text');
+
+function loadQuestion() {
+    nextBtnElem.style.display = 'none';
+    const currentQuestion = quizData[currentQuestionIndex];
+    
+    progressTextElem.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+    questionTextElem.innerText = currentQuestion.q;
+    optionsContainerElem.innerHTML = '';
+
+    currentQuestion.a.forEach((option, index) => {
+        const li = document.createElement('li');
+        li.className = 'option-item';
+        li.innerText = option;
+        li.onclick = () => checkAnswer(index, li);
+        optionsContainerElem.appendChild(li);
+    });
+}
+
+function checkAnswer(selectedIndex, selectedElement) {
+    const currentQuestion = quizData[currentQuestionIndex];
+    const options = optionsContainerElem.children;
+
+    totalAnswered++;
+
+    if (selectedIndex === currentQuestion.c) {
+        selectedElement.classList.add('correct');
+        score++;
+    } else {
+        selectedElement.classList.add('incorrect');
+        // Show the user the correct answer by coloring it green
+        options[currentQuestion.c].classList.add('correct');
+    }
+
+    // Disable all options after an answer is chosen
+    for (let i = 0; i < options.length; i++) {
+        options[i].classList.add('disabled');
+    }
+
+    scoreTextElem.innerText = `Score: ${score}/${totalAnswered}`;
+    nextBtnElem.style.display = 'block';
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.length) {
+        loadQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    quizUiElem.style.display = 'none';
+    resultsUiElem.style.display = 'block';
+    finalScoreTextElem.innerText = `${score} / ${quizData.length}`;
+}
+
+function restartQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    totalAnswered = 0;
+    scoreTextElem.innerText = `Score: 0/0`;
+    quizUiElem.style.display = 'block';
+    resultsUiElem.style.display = 'none';
+    loadQuestion();
+}
+
+// Initial Init
+loadQuestion();
+</script>
+
+</body>
+</html>
