@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CompTIA Cloud+ CV0-004 Ultimate Exam Quiz</title>
+    <style>
+        :root {
+            --bg-color: #0d0202; /* Midnight Black */
+            --card-bg: #1a0505; /* Deep Blood Red-Black */
+            --text-color: #e0d0d0; /* Muted Ash White */
+            --primary-color: #990000; /* Crimson Red */
+            --accent-color: #da1a1a; /* Bright Blood */
+            --correct-color: #1a3a1e; /* Dark Venom Green */
+            --correct-text: #55efc4; 
+            --incorrect-color: #4a0404; /* Dark Crimson */
+            --incorrect-text: #ff7675;
+            --border-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            border: 1px solid #3a0000;
+            box-shadow: 0 0 20px rgba(153, 0, 0, 0.25);
+            max-width: 700px;
+            width: 100%;
+            padding: 20px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #3a0808;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .progress, .score-tracker {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #8a7373;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-shadow: 0 0 5px rgba(218, 26, 26, 0.2);
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            background-color: #240a0a;
+            border: 2px solid #3d1414;
+            border-radius: var(--border-radius);
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text-color);
+        }
+
+        .option-item.eliminated {
+            text-decoration: line-through;
+            text-decoration-color: var(--accent-color);
+            text-decoration-thickness: 2px;
+            opacity: 0.35;
+            border-color: #220000;
+        }
+
+        @media (hover: hover) {
+            .option-item:hover:not(.disabled) {
+                border-color: var(--accent-color);
+                background-color: #310d0d;
+                box-shadow: 0 0 8px rgba(218, 26, 26, 0.2);
+            }
+        }
+
+        .option-item.correct {
+            background-color: var(--correct-color) !important;
+            border-color: #2ecc71 !important;
+            color: var(--correct-text) !important;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            text-decoration: none !important;
+            opacity: 1 !important;
+        }
+
+        .option-item.incorrect {
+            background-color: var(--incorrect-color) !important;
+            border-color: var(--accent-color) !important;
+            color: var(--incorrect-text) !important;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            text-decoration: none !important;
+            opacity: 1 !important;
+        }
+
+        .option-item.disabled {
+            pointer-events: none;
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: 1px solid #660000;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .action-btn:active {
+            background-color: var(--accent-color);
+        }
+
+        .results-screen {
+            text-align: center;
+            display: none;
+            padding: 20px 10px;
+        }
+
+        .results-screen h2 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .final-score {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(218, 26, 26, 0.6);
+        }
+
+        @media (min-width: 576px) {
+            body { padding: 24px; }
+            .quiz-container { padding: 30px; }
+            .question { font-size: 1.2rem; }
+            .option-item { font-size: 1rem; padding: 16px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-ui">
+        <div class="header">
+            <span class="progress" id="progress-text">Question 1 of 70</span>
+            <span class="score-tracker" id="score-text">Score: 0/0</span>
+        </div>
+        <div class="question" id="question-text">Loading question bank...</div>
+        <ul class="options-list" id="options-container"></ul>
+        <button class="action-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <div id="results-ui" class="results-screen">
+        <h2>Quiz Complete</h2>
+        <p>Your ultimate performance score across the Cloud+ CV0-004 targets:</p>
+        <div class="final-score" id="final-score-text">0/70</div>
+        <button class="action-btn" style="display:block;" onclick="restartQuiz()">Retake Exam</button>
+    </div>
+</div>
+
+<script>
+const originalQuizData = [
+    { q: "[1.4] An engineer needs cost-effective storage for regulatory backups that are accessed less than once a year but require retrieval within a few hours. Which storage tier should be selected?", a: ["Hot storage", "Warm storage", "Cold storage", "Archive storage"], c: 3 },
+    { q: "[1.4] Which disk type should be selected to maximize input/output operations per second (IOPS) for a high-performance database workload?", a: ["SATA Hard Disk Drive (HDD)", "Solid-State Drive (SSD)", "SAS Hard Disk Drive (HDD)", "Tape Drive Backup Block"], c: 1 },
+    { q: "[1.4] A cloud application needs an unstructured repository to store millions of image files, each associated with distinct metadata properties. Which storage type is best tailored for this workflow?", a: ["Block storage", "File storage", "Object storage", "Ephemeral storage"], c: 2 },
+    { q: "[1.4] An administrator attaches a raw, unformatted volume directly to an EC2 instance to act as a database log partition. What storage type is being used?", a: ["Block storage", "Object storage", "File storage", "Network Attached Storage (NAS)"], c: 0 },
+    { q: "[1.4] Multiple virtual machines hosted in separate subnets need concurrent read/write access to a shared directory using standard protocols like NFS or SMB. What storage type fulfills this request?", a: ["Object storage", "File storage", "Raw block volume", "Instance store disk"], c: 1 },
+    { q: "[1.4] A cloud database backup process needs to store files in a tier that offers the absolute lowest cost, where retrieval times of 12 hours are perfectly acceptable. Which tier fits best?", a: ["Hot", "Warm", "Cold", "Archive"], c: 3 },
+    { q: "[1.4] When designing a web application frontend that frequently serves active user profile avatars with zero latency, which storage tier must be used?", a: ["Hot tier", "Warm tier", "Cold tier", "Archive tier"], c: 0 },
+    { q: "[1.5] A company wants to migrate an application but intends to pass operational overhead for OS patching and database scaling entirely to the cloud service provider. What concept solves this?", a: ["[IaaS] Virtual Machine deployment", "Cloud-provided managed services", "Loosely coupled architecture", "On-premises dedicated hypervisors"], c: 1 },
+    { q: "[1.5] An architecture pattern breaks a monolithic system into highly isolated, independent services running specific operational business units. What pattern is this?", a: ["Virtual clustering", "Microservices", "Hypervisor pass-through", "Monolithic orchestration"], c: 1 },
+    { q: "[1.5] An application uses message queues to ensure that a failure in the billing service does not cause the frontend ordering portal to drop connection or crash. What architecture type does this represent?", a: ["Tightly coupled architecture", "Loosely coupled architecture", "Hardware pass-through", "Single point of failure layout"], c: 1 },
+    { q: "[1.5] An event handler publishes a single payload to a topic, which immediately distributes that message simultaneously to multiple downstream queues and serverless functions. What cloud-native pattern is this?", a: ["Fan-out", "Service discovery", "Microservices isolation", "Persistent volume mapping"], c: 0 },
+    { q: "[1.5] When container workloads scale out dynamically, how do new instances register their locations so other components can automatically find and route traffic to them?", a: ["Static IP allocation", "Service discovery", "Host affinity maps", "Rightsizing matrices"], c: 1 },
+    { q: "[1.6] A developer runs a single software workload container on an isolated engine environment without an orchestration framework or high-availability control plane. What deployment model is this?", a: ["Stand-alone container", "Workload orchestration", "Clustered hypervisor", "Persistent volume group"], c: 0 },
+    { q: "[1.6] Which software stack is designed to automate the deployment, scaling, management, and health checking of multi-container microservice arrays across a host pool?", a: ["Ansible engine", "Workload orchestration (e.g., Kubernetes)", "Stand-alone Docker runtime", "Git enterprise repository"], c: 1 },
+    { q: "[1.6] A container needs to receive external web traffic hitting the physical host on port 8080 and forward it to internal port 80. What container networking concept achieves this?", a: ["Overlay network encapsulation", "Port mapping", "Host affinity assignment", "Hardware pass-through"], c: 1 },
+    { q: "[1.6] A containerized app requires data to survive even if the container crashes, restarts, or is completely rescheduled to a different host node. What should be attached?", a: ["Ephemeral storage", "Persistent volumes", "Instance store disk", "Local caching block"], c: 1 },
+    { q: "[1.6] Where are pre-built container base images stored centrally so that orchestration platforms can pull down code definitions securely during scaling actions?", a: ["Image registries", "Storage Area Networks (SAN)", "Object storage metadata tags", "Configuration-as-code files"], c: 0 },
+    { q: "[1.6] A microservice container uses local memory space that is completely wiped clean the instant the container terminates or gets deleted. What storage type is this?", a: ["Persistent volume", "Ephemeral storage", "Storage Area Network", "Network Attached Storage"], c: 1 },
+    { q: "[1.7] A collection of physical hypervisor hosts are combined under a central management plane to share compute capacity and provide automatic failover if a host node dies. What is this?", a: ["Stand-alone virtualization", "Clustering", "Cloning", "Host affinity configuration"], c: 1 },
+    { q: "[1.7] An administrator needs an exact bit-for-bit replication of an active production virtual machine to troubleshoot bugs in an isolated staging network. What operation should be run?", a: ["Snapshot archiving", "Cloning", "Rightsizing analysis", "Drift verification"], c: 1 },
+    { q: "[1.7] A security rule dictates that a specific database virtual machine containing highly restricted data must always execute on one distinct, hardened physical hypervisor host. What feature enforces this?", a: ["Host affinity", "Hardware pass-through", "Overlay networks", "Workload orchestration"], c: 0 },
+    { q: "[1.7] A virtual machine requires direct, high-speed access to a physical PCIe graphics processor or fiber channel card, bypassing the hypervisor's translation layer. What virtualization feature allows this?", a: ["Clustering configuration", "Host anti-affinity rules", "Hardware pass-through", "Overlay networks encapsulation"], c: 2 },
+    { q: "[1.7] Which network virtualization design encapsulates layer 2 traffic inside layer 3 packets to build a software-defined logic layer spanning across discrete physical networks?", a: ["Virtual Machine (VM) networks", "Overlay networks", "Local Area Networks (VLANs)", "Storage Area Networks (SAN)"], c: 1 },
+    { q: "[1.7] A cloud storage network relies on dedicated Fiber Channel switches to deliver high-speed block-level access directly to connected hypervisor nodes. What is this architecture?", a: ["Network-Attached Storage (NAS)", "Storage Area Network (SAN)", "Local Ephemeral Drive", "Object Storage Vault"], c: 1 },
+    { q: "[1.7] An engineer provisions a single hypervisor instance operating independently with zero connection to a wider automated platform node pool. What model is this?", a: ["Clustered architecture", "Stand-alone virtualization", "Overlay mapping", "Host affinity scheduling"], c: 1 },
+    { q: "[1.8] A business wants to lease a physical server in a public cloud data center to guarantee total hardware isolation for compliance needs. Which billing model matches?", a: ["Spot instance", "Pay-as-you-go", "Reserved resource instance", "Dedicated host"], c: 3 },
+    { q: "[1.8] An organization has steady, predictable baseline workloads running 24/7/365 and wants to commit to a 3-year term to secure maximum compute discounts. Which model is best?", a: ["Spot instance", "Reserved resources", "Pay-as-you-go", "Dedicated host leasing"], c: 1 },
+    { q: "[1.8] A data processing job can be interrupted safely at any point without impacting business workflows. Which highly discounted, ephemeral billing model should be chosen?", a: ["Pay-as-you-go", "Spot instance", "Reserved resources", "Dedicated host allocation"], c: 1 },
+    { q: "[1.8] To correctly distribute costs to separate business units, what administrative tool should be enforced across all cloud resource metadata metadata profiles?", a: ["Resource metering monitors", "Tagging", "Rightsizing engines", "Drift detection scripts"], c: 1 },
+    { q: "[1.8] An administrator reviews CPU utilization graphs and downscales a VM instance from 16 vCPUs to 4 vCPUs because historical use never climbed past ten percent. What process was completed?", a: ["Drift mitigation", "Rightsizing", "Horizontal scaling", "Resource metering optimization"], c: 1 },
+    { q: "[1.9] A financial tracking system requires strict transactional consistency, absolute ACID compliance, and uses schema tables linked via primary and foreign key attributes. What database type is required?", a: ["Non-relational database", "Relational database", "Object storage repository", "Key-value cache stack"], c: 1 },
+    { q: "[1.9] An agile application processes unstructured document payloads and fast-changing social feeds that do not match a predictable database schema. What type is preferred?", a: ["Relational database", "Non-relational database", "SQL data warehouse", "Structured data array"], c: 1 },
+    { q: "[1.9] An engineer builds an EC2 instance, manually installs an Oracle engine database, configures the OS, and assumes responsibility for all underlying data engine tuning. What deployment option is this?", a: ["Provider-managed database", "Self-managed database", "Serverless managed database", "SaaS integrated database"], c: 1 },
+    { q: "[1.9] A company chooses a deployment option where the cloud vendor handles all engine upgrades, replication, and high-availability backups for a PostgreSQL system. What model is this?", a: ["Self-managed", "Provider-managed", "Stand-alone host", "On-premises private block"], c: 1 },
+    { q: "[1.10] An architect wants to build an application component that executes code only when triggered by an API request, scales instantly to zero when idle, and removes all server lifecycle upkeep. What compute layer fits?", a: ["Virtual Machine (VM)", "Container instance", "Serverless function", "Dedicated hypervisor cluster"], c: 2 },
+    { q: "[1.10] When optimizing network delivery across continents, which metric tracks the round-trip delay time it takes for a data packet to travel from a client to a server instance?", a: ["Throughput rate", "Latency", "IOPS delivery metric", "Bandwidth capacity"], c: 1 },
+    { q: "[1.10] An engineer monitors storage performance on a transactional cloud database disk and observes bottlenecks in random read/write speeds. Which optimization metric should be scaled up?", a: ["Throughput megabytes-per-second", "Input/output operations per second (IOPS)", "Data classification retention rules", "Network latency optimization"], c: 1 },
+    { q: "[1.10] Which metric represents the total volume of data successfully transmitted across a cloud network link per second?", a: ["Latency", "Throughput", "IOPS", "Affinity"], c: 1 },
+    { q: "[1.11] A cloud application needs to scan uploaded feedback text to determine if customer sentiment is positive, neutral, or negative. Which AI capability accomplishes this?", a: ["Text translation processing", "Sentiment analysis", "Visual recognition parsing", "Generative AI orchestration"], c: 1 },
+    { q: "[1.11] Thousands of low-power temperature sensors in a smart city deployment stream telemetric readings over long distances. What architectural device collects this data locally before routing it up to a cloud core?", a: ["An image registry node", "An IoT Gateway", "A serverless broker layer", "A relational cluster master"], c: 1 },
+    { q: "[2.1] A company builds cloud environments using infrastructure completely shared with other public clients over public networks via a multi-tenant provider model. What model is this?", a: ["Private cloud", "Hybrid cloud", "Public cloud", "Community cloud"], c: 2 },
+    { q: "[2.1] An organization combines its on-premises corporate data center network directly with a public cloud service provider using an encrypted VPN tunnel, allowing smooth workload portability. What model is this?", a: ["Community cloud", "Private cloud environment", "Hybrid cloud", "Isolated tenancy deployment"], c: 2 },
+    { q: "[2.2] An ops team deploys a new version of an application into a completely identical, separate staging environment, runs checks, and shifts 100% of network traffic immediately over via a router change. What strategy is this?", a: ["Canary deployment", "Rolling update", "In-place upgrade", "Blue-green deployment"], c: 3 },
+    { q: "[2.2] A cloud engineer releases a brand new software feature to exactly five percent of users to verify application metrics before pushing the changes out to the rest of the customer base. What strategy is this?", a: ["Blue-green deployment", "Canary deployment", "In-place upgrade", "Rolling update"], c: 1 },
+    { q: "[2.2] An orchestration tool updates a cluster by taking down a single old container replica, spawning a new container version, checking its stability, and repeating the cycle across the fleet. What strategy is this?", a: ["In-place upgrade", "Blue-green deployment", "Rolling update", "Canary deployment"], c: 2 },
+    { q: "[2.3] A company migrates a legacy system to the cloud by copying its software virtual machines exactly as-is into cloud instances without any code changes. What application migration strategy is this?", a: ["Replatform", "Rehost (Lift-and-shift)", "Refactor", "Re-architect"], c: 1 },
+    { q: "[2.3] An IT team takes an on-premises web server and moves it to a cloud managed container platform, adjusting minimal deployment configurations to run natively but avoiding rewriting the core application code. What strategy is this?", a: ["Rehost", "Replatform", "Retain", "Retire"], c: 1 },
+    { q: "[2.3] Due to strict national regulatory laws passed regarding financial data residency, an enterprise must pull database assets out of a public cloud and restore them inside an on-premises facility. What type of migration is this?", a: ["On-premises-to-cloud", "Cloud-to-on-premises", "Cloud-to-cloud", "Federated provisioning migration"], a: ["On-premises-to-cloud", "Cloud-to-on-premises", "Cloud-to-cloud", "Federated provisioning migration"], c: 1 },
+    { q: "[2.3] A company discards a costly, obsolete proprietary CRM application entirely during migration and switches directly to a cloud-based SaaS alternative. What migration strategy is this?", a: ["Retain", "Retire", "Replatform", "Refactor"], c: 1 },
+    { q: "[2.4] An administrative tool uses automated JSON or YAML template files to build and modify matching networks, security walls, and compute instances across an API provider plane. What concept is this?", a: ["Configuration as Code (CaC)", "Infrastructure as Code (IaC)", "Scripting conditional functions", "Drift baseline mapping"], c: 1 },
+    { q: "[2.4] An automated daily check scans cloud architecture and discovers that an engineer manually opened port 22 on a firewall outside of the approved corporate code templates. What condition was discovered?", a: ["Versioning mismatch", "Configuration drift", "Data type casting failure", "Service throttling limit"], c: 1 },
+    { q: "[2.4] Which file formatting syntax relies heavily on whitespace indentations and dashes rather than brackets or commas to outline complex infrastructure definitions?", a: ["JSON", "YAML", "XML", "INI"], c: 1 },
+    { q: "[2.5] A healthcare organization provisioning cloud assets must explicitly verify encryption algorithms, log controls, and access restrictions to comply with national privacy legislation. Which requirement type is driving this configuration?", a: ["Performance requirements", "Cost requirements", "Availability requirements", "Compliance/Security requirements"], c: 3 },
+    { q: "[3.1] An operations system pulls runtime log events from 50 separate virtual machine targets and combines them into one centralized indexing analytical workspace. What process was completed?", a: ["Log collection", "Log aggregation", "Distributed tracing", "Metrics triage"], c: 1 },
+    { q: "[3.1] A developer needs to follow a single customer transaction as it moves across five distinct microservice containers and network components to debug an intermittent error. What mechanism should be used?", a: ["Log collection analysis", "Distributed tracing", "Metrics monitoring aggregation", "Static baseline alerting"], c: 1 },
+    { q: "[3.2] A cloud scaling engine watches real-time metrics and launches an extra 5 virtual machine instances when an application's CPU usage spikes past eighty percent for ten straight minutes. What scaling approach is this?", a: ["Scheduled horizontal scaling", "Triggered load scaling", "Manual vertical scaling", "Trending event optimization"], c: 1 },
+    { q: "[3.2] An online retailer changes its auto-scaling configurations to proactively double its available container count at exactly 06:00 AM every Friday in anticipation of predictable weekend shopping rushes. What scaling approach is this?", a: ["Triggered event scaling", "Scheduled scaling", "Manual vertical scaling", "Trending load scaling"], c: 1 },
+    { q: "[3.2] An administrator upgrades an existing cloud database host by changing its hardware specification from 4 CPU cores and 16GB of RAM to 16 CPU cores and 64GB of RAM. What type of scaling is this?", a: ["Horizontal scaling", "Vertical scaling", "Elastic load balancing", "Loosely coupled expansion"], c: 1 },
+    { q: "[3.3] A backup window policy dictates that a backup run on Wednesday night must save every single data block modified since the last absolute FULL backup completed on Sunday. What backup type is this?", a: ["Incremental backup", "Differential backup", "Snapshot replication", "Granular archive file"], c: 1 },
+    { q: "[3.3] An administrator completes a backup job that copies only the data files that have changed since the previous backup task of any kind, resulting in the smallest daily backup file size. What type is this?", a: ["Full backup", "Differential backup", "Incremental backup", "Off-site archive block"], c: 2 },
+    { q: "[3.3] A database engineer recovers an accidentally deleted table row without restoring the entire multi-terabyte database instance or causing downtime. What type of recovery option is this?", a: ["Bulk recovery", "Granular recovery", "In-place parallel restore", "Off-site replication recovery"], c: 1 },
+    { q: "[3.4] A hardware vendor announces that a critical server type will hit a milestone where it will no longer receive any official security patches or tech support from the manufacturer. What is this state?", a: ["End of life (EOL)", "End of support (EOS)", "Decommissioning baseline phase", "Minor update deprecation"], c: 1 },
+    { q: "[4.1] A security engineer reviews a standard industry vulnerability database entry labeled with a unique ID format like CVE-2026-1234. What does CVE stand for?", a: ["Critical Vulnerability Escalation", "Common Vulnerabilities and Exposures", "Cloud Vulnerability Evaluation", "Centralized Vulnerability Enclosure"], c: 1 },
+    { q: "[4.2] A legal framework dictates that digital patient records created within a specific country must remain physically stored inside data centers within that nation's borders. What concept is this?", a: ["Data locality", "Data sovereignty", "Data classification", "Litigation hold rules"], c: 1 },
+    { q: "[4.2] A security team receives a formal judicial notice to guarantee that no electronic records, chat logs, or developer data files are modified or deleted for an ongoing legal case. What control should be placed on the assets?", a: ["SOC2 classification hold", "Litigation hold", "Regulatory retention archiving", "Data sovereignty lock"], c: 1 },
+    { q: "[4.2] A cloud provider wants to demonstrate to potential corporate clients that they maintain secure operations, system confidentiality, and absolute privacy controls via an independent auditing report. Which standard report is most widely requested for this?", a: ["PCI DSS certification", "SOC2 Type II report", "ISO 27001 baseline artifact", "Cloud Security Alliance registry file"], c: 1 },
+    { q: "[4.3] A developer uses programmatic access to spin up cloud infrastructure via code. What tool are they communicating with directly?", a: ["Web management portal", "Application Programming Interface (API)", "Secure Shell (SSH) gateway", "Discretionary system terminal"], c: 1 },
+    { q: "[4.3] To log into an administrative Linux cloud instance securely over an encrypted command-line shell channel via port 22, which tool should be utilized?", a: ["Remote Desktop Protocol (RDP)", "Secure Shell (SSH)", "Web browser portal", "Simple Object Access Protocol (SOAP)"], c: 1 },
+    { q: "[4.3] A cloud layout forces all incoming administrative traffic to connect to one highly locked down, monitored gateway virtual machine before engineers can hop to any internal server subnets. What is this gateway machine called?", a: ["Identity Provider (IdP)", "Bastion host / Jump box", "Web Application Firewall (WAF)", "OAuth authorization server"], c: 1 },
+    { q: "[4.4] Which cybersecurity philosophy requires continuous verification of every user, device, and request, completely removing implicit trust inside a network perimeter?", a: ["Defense in depth", "Zero Trust", "Hardened infrastructure baselines", "Least privilege isolation"], c: 1 }
+];
+
+let quizData = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let totalAnswered = 0;
+
+const questionTextElem = document.getElementById('question-text');
+const optionsContainerElem = document.getElementById('options-container');
+const progressTextElem = document.getElementById('progress-text');
+const scoreTextElem = document.getElementById('score-text');
+const nextBtnElem = document.getElementById('next-btn');
+const quizUiElem = document.getElementById('quiz-ui');
+const resultsUiElem = document.getElementById('results-ui');
+const finalScoreTextElem = document.getElementById('final-score-text');
+
+function shuffleQuizData() {
+    quizData = originalQuizData.map(item => ({
+        q: item.q,
+        a: [...item.a],
+        c: item.c
+    }));
+
+    // Fisher-Yates shuffle algorithm for the questions array
+    for (let i = quizData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
+    }
+
+    // Shuffle options inside each question securely
+    quizData.forEach(item => {
+        const correctAnswerText = item.a[item.c];
+        for (let i = item.a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [item.a[i], item.a[j]] = [item.a[j], item.a[i]];
+        }
+        item.c = item.a.indexOf(correctAnswerText);
+    });
+}
+
+function loadQuestion() {
+    nextBtnElem.style.display = 'none';
+    const currentQuestion = quizData[currentQuestionIndex];
+    
+    progressTextElem.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+    questionTextElem.innerText = currentQuestion.q;
+    optionsContainerElem.innerHTML = '';
+
+    currentQuestion.a.forEach((option, index) => {
+        const li = document.createElement('li');
+        li.className = 'option-item';
+        li.innerText = option;
+        setupPressEvents(li, index);
+        optionsContainerElem.appendChild(li);
+    });
+}
+
+function setupPressEvents(element, index) {
+    let pressTimer;
+    let isLongPress = false;
+
+    const startPress = (e) => {
+        isLongPress = false;
+        pressTimer = setTimeout(() => {
+            isLongPress = true;
+            element.classList.toggle('eliminated');
+        }, 500); // 500ms criteria for strikeout line toggle
+    };
+
+    const endPress = (e) => {
+        clearTimeout(pressTimer);
+        if (!isLongPress && !element.classList.contains('eliminated')) {
+            checkAnswer(index, element);
+        }
+    };
+
+    const cancelPress = () => {
+        clearTimeout(pressTimer);
+    };
+
+    element.addEventListener('touchstart', startPress, { passive: true });
+    element.addEventListener('touchend', endPress);
+    element.addEventListener('touchmove', cancelPress);
+
+    element.addEventListener('mousedown', startPress);
+    element.addEventListener('mouseup', endPress);
+    element.addEventListener('mouseleave', cancelPress);
+}
+
+function checkAnswer(selectedIndex, selectedElement) {
+    const currentQuestion = quizData[currentQuestionIndex];
+    const options = optionsContainerElem.children;
+
+    totalAnswered++;
+
+    if (selectedIndex === currentQuestion.c) {
+        selectedElement.classList.add('correct');
+        score++;
+    } else {
+        selectedElement.classList.add('incorrect');
+        options[currentQuestion.c].classList.add('correct');
+    }
+
+    for (let i = 0; i < options.length; i++) {
+        options[i].classList.add('disabled');
+    }
+
+    scoreTextElem.innerText = `Score: ${score}/${totalAnswered}`;
+    nextBtnElem.style.display = 'block';
+    
+    setTimeout(() => {
+        nextBtnElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.length) {
+        loadQuestion();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    quizUiElem.style.display = 'none';
+    resultsUiElem.style.display = 'block';
+    finalScoreTextElem.innerText = `${score} / ${quizData.length}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restartQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    totalAnswered = 0;
+    scoreTextElem.innerText = `Score: 0/0`;
+    quizUiElem.style.display = 'block';
+    resultsUiElem.style.display = 'none';
+    shuffleQuizData();
+    loadQuestion();
+}
+
+shuffleQuizData();
+loadQuestion();
+</script>
+
+</body>
+</html>
